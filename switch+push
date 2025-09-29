@@ -1,0 +1,5 @@
+cd ~/nix/
+git add .
+git commit -m "automated config commit"
+git push
+sudo nixos-rebuild switch --flake ~/nix#nixos
