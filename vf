@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+dir=$(fzf)
+
+if [ -z $dir ]; then
+        echo "Nothing selected... Bye!"
+else
+        nvim $dir
+fi

@@ -1,0 +1,105 @@
+#!/usr/bin/env bash
+
+check_if_sourced() {
+        if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+                echo "This script must be sourced to change directories. Use:"
+                echo "  source $0 <command>"
+                exit 1
+        fi
+}
+
+help_screen() {
+                echo "$0 - Pin current directory and go back to it later."
+                echo "Commands:"
+                echo "$0 -h, --help - show this help screen"
+                echo "$0 pin <directory> - pin a directory"
+                echo "$0 goto <none> - goto pinned directory"
+}
+
+
+# Main program
+
+if [[ -z "$1" ]]; then
+        echo "Not enough arguments."
+        echo
+        help_screen
+        exit 1
+fi
+
+case "$1" in
+        -h | --help )
+                help_screen
+                ;;
+
+                pin)
+                check_if_sourced
+                dir="$2"
+                if [[ -z "$dir" ]]; then
+                        echo "Please enter the directory to pin, or . for current directory"
+                else
+                        real_dir=$(realpath "$dir")
+                        mkdir -p /tmp/bck/
+                        touch /tmp/bck/pin
+                        echo "$real_dir" > /tmp/bck/pin
+                fi
+
+                ;;
+        goto)
+                check_if_sourced
+                dir=$(cat /tmp/bck/pin)
+                current_dir=$(pwd)
+
+                if [[ ! -f /tmp/bck/pin ]]; then
+                        echo "Registry does not exist."
+                        exit 1
+                fi
+                dir=$(cat /tmp/bck/pin)
+                if [[ -z "$dir" ]]; then
+                        echo "Registry is empty"
+                        exit 1
+                fi
+                if [[ ! -d "$dir" ]]; then
+                        echo "The directory '$dir' does not exist"
+                        exit 1
+                fi
+
+                mkdir -p /tmp/bck
+                touch /tmp/bck/last
+                echo "$current_dir" > /tmp/bck/last
+
+                cd "$dir" || { echo "$dir probably does not exist, hence failed to switch to it."; exit 1; }
+                echo "$dir"
+
+                ;;
+        goback)
+                check_if_sourced
+                dir=$(cat /tmp/bck/pin)
+                current_dir=$(realpath $(pwd))
+
+                if [[ ! -f /tmp/bck/last ]]; then
+                        echo "Registry does not exist."
+                        exit 1
+                fi
+                dir=$(cat /tmp/bck/last)
+                if [[ -z "$dir" ]]; then
+                        echo "Registry is empty"
+                        exit 1
+                fi
+                if [[ ! -d "$dir" ]]; then
+                        echo "The directory '$dir' does not exist"
+                        exit 1
+                fi
+
+                mkdir -p /tmp/bck
+
+                cd "$dir" || { echo "$dir probably does not exist, hence failed to switch to it."; exit 1; }
+                echo "$dir"
+
+                ;;
+        *)
+                echo "Invalid command '$1'"
+                echo
+                help_screen
+                exit 1
+                ;;
+esac
