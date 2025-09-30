@@ -12,9 +12,9 @@ help_screen() {
                 echo "$0 - Pin current directory and go back to it later."
                 echo "Commands:"
                 echo "$0 -h, --help - show this help screen"
-                echo "$0 pin <directory> - pin a directory"
-                echo "$0 goto <none> - goto pinned directory"
-                echo "$0 goback <none> - go back to last directory"
+                echo "source $0 pin <directory> - pin a directory"
+                echo "source $0 goto <none> - goto pinned directory"
+                echo "source $0 goback <none> - go back to last directory"
 }
 
 
