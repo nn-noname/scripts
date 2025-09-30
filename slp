@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+if [ $# -eq 0 ]; then
+    echo "Usage: $0 <seconds>"
+    echo "Example: $0 300  # Sleep for 5 minutes before locking and suspending"
+    exit 1
+fi
+
+SLEEP_DURATION=$1
+
+if ! [[ "$SLEEP_DURATION" =~ ^[0-9]+$ ]]; then
+    echo "Argument must be a positive integer (seconds)"
+    exit 1
+fi
+
+echo "Staying awake for $SLEEP_DURATION seconds..."
+sleep "$SLEEP_DURATION"
+
+hyprlock &
+
+sleep 1
+
+echo "Good night!"
+systemctl suspend
